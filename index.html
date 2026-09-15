@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b1018" />
+    <title>Metatron's Cube</title>
+  </head>
+  <body>
+    <main class="experience">
+      <header class="intro">
+        <h1>Metatron’s Cube</h1>
+      </header>
+      <section class="canvas-frame" aria-label="Interactive rendering of Metatron's Cube">
+        <canvas id="canvas"></canvas>
+      </section>
+      <section class="controls" aria-label="Platonic solid controls">
+        <article class="solid-control">
+          <button class="solid-button" data-solid="tetrahedron" aria-pressed="false">Tetrahedron</button>
+          <fieldset class="scope-switch"><legend>Tetrahedron position</legend>
+            <label><input class="scope-input" type="radio" name="tetrahedron-scope" value="inner" /><span>Inner</span></label>
+            <label><input class="scope-input" type="radio" name="tetrahedron-scope" value="outer" /><span>Outer</span></label>
+            <label><input class="scope-input" type="radio" name="tetrahedron-scope" value="both" checked /><span>Both</span></label>
+          </fieldset>
+        </article>
+        <article class="solid-control">
+          <button class="solid-button" data-solid="cube" aria-pressed="false">Cube</button>
+          <fieldset class="scope-switch"><legend>Cube position</legend>
+            <label><input class="scope-input" type="radio" name="cube-scope" value="inner" /><span>Inner</span></label>
+            <label><input class="scope-input" type="radio" name="cube-scope" value="outer" /><span>Outer</span></label>
+            <label><input class="scope-input" type="radio" name="cube-scope" value="both" checked /><span>Both</span></label>
+          </fieldset>
+        </article>
+        <article class="solid-control">
+          <button class="solid-button" data-solid="octahedron" aria-pressed="false">Octahedron</button>
+          <fieldset class="scope-switch"><legend>Octahedron position</legend>
+            <label><input class="scope-input" type="radio" name="octahedron-scope" value="inner" /><span>Inner</span></label>
+            <label><input class="scope-input" type="radio" name="octahedron-scope" value="outer" /><span>Outer</span></label>
+            <label><input class="scope-input" type="radio" name="octahedron-scope" value="both" checked /><span>Both</span></label>
+          </fieldset>
+        </article>
+        <article class="solid-control">
+          <button class="solid-button" data-solid="dodecahedron" aria-pressed="false">Dodecahedron</button>
+          <fieldset class="scope-switch"><legend>Dodecahedron position</legend>
+            <label><input class="scope-input" type="radio" name="dodecahedron-scope" value="inner" /><span>Inner</span></label>
+            <label><input class="scope-input" type="radio" name="dodecahedron-scope" value="outer" /><span>Outer</span></label>
+            <label><input class="scope-input" type="radio" name="dodecahedron-scope" value="both" checked /><span>Both</span></label>
+          </fieldset>
+        </article>
+        <article class="solid-control">
+          <button class="solid-button" data-solid="icosahedron" aria-pressed="false">Icosahedron</button>
+          <fieldset class="scope-switch"><legend>Icosahedron position</legend>
+            <label><input class="scope-input" type="radio" name="icosahedron-scope" value="inner" /><span>Inner</span></label>
+            <label><input class="scope-input" type="radio" name="icosahedron-scope" value="outer" /><span>Outer</span></label>
+            <label><input class="scope-input" type="radio" name="icosahedron-scope" value="both" checked /><span>Both</span></label>
+          </fieldset>
+        </article>
+      </section>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+
+# Vite build output and caches
+dist/
+dist-ssr/
+.vite/
+coverage/
+
+# Local environment files (keep documented examples)
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.local
+
+# Package-manager and application logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# LazyVim / Neovim temporary and generated files
+*.swp
+*.swo
+*.swn
+*.un~
+*~
+.nvimlog
+Session.vim
+Sessionx.vim
+tags
+
+# Fedora / Linux desktop metadata and trash folders
+.directory
+.Trash-*/
+
+# Local coding-agent workspace metadata
+.agents/
+.codex/
