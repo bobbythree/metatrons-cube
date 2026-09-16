@@ -32,14 +32,6 @@ const solids = {
   tetrahedron: { vertices: [[1, 1, 1], [1, -1, -1], [-1, 1, -1], [-1, -1, 1]] },
   cube: { vertices: signed([1, 1, 1]) },
   octahedron: { vertices: [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]] },
-  dodecahedron: {
-    vertices: uniqueVertices([
-      ...signed([1, 1, 1]),
-      ...signed([0, 1 / PHI, PHI]),
-      ...signed([1 / PHI, PHI, 0]),
-      ...signed([PHI, 0, 1 / PHI]),
-    ]),
-  },
   icosahedron: {
     vertices: uniqueVertices([
       ...signed([0, 1, PHI]),
@@ -70,41 +62,11 @@ Object.values(solids).forEach((solid) => {
   }
 })
 
-// In the conventional construction the dodecahedron is the geometric dual of
-// the icosahedron: each of its vertices is the centre of one triangular face.
-// Deriving it here keeps all 20 vertices and all 30 edges exact and connected.
-const icosahedronFaces = []
-for (let i = 0; i < solids.icosahedron.vertices.length; i += 1) {
-  for (let j = i + 1; j < solids.icosahedron.vertices.length; j += 1) {
-    for (let k = j + 1; k < solids.icosahedron.vertices.length; k += 1) {
-      const hasEdge = (a, b) => solids.icosahedron.edges.some(
-        ([start, end]) => (start === a && end === b) || (start === b && end === a),
-      )
-      if (hasEdge(i, j) && hasEdge(j, k) && hasEdge(k, i)) icosahedronFaces.push([i, j, k])
-    }
-  }
-}
-
-solids.dodecahedron.vertices = icosahedronFaces.map((face) => [0, 1, 2].map(
-  (dimension) => face.reduce(
-    (sum, vertexIndex) => sum + solids.icosahedron.vertices[vertexIndex][dimension],
-    0,
-  ) / 3,
-))
-solids.dodecahedron.edges = []
-for (let i = 0; i < icosahedronFaces.length; i += 1) {
-  for (let j = i + 1; j < icosahedronFaces.length; j += 1) {
-    const sharedVertices = icosahedronFaces[i].filter((vertex) => icosahedronFaces[j].includes(vertex))
-    if (sharedVertices.length === 2) solids.dodecahedron.edges.push([i, j])
-  }
-}
-
 // The standard golden-ratio coordinates are rotated in their projection plane.
 // This correction places the six outer icosahedron vertices exactly on the
-// vertical Metatron lattice while preserving the dual dodecahedron orientation.
+// vertical Metatron lattice.
 const GOLDEN_SOLID_ROTATION = -22.23875609296496 * (Math.PI / 180)
 solids.icosahedron.rotation = GOLDEN_SOLID_ROTATION
-solids.dodecahedron.rotation = GOLDEN_SOLID_ROTATION
 
 // Look down the [1, 1, 1] axis. This is the corner-on projection that
 // produces Metatron's sixfold lattice: a cube's six visible vertices land
@@ -201,6 +163,59 @@ function drawSolid(solid, centerX, centerY, radius) {
   ctx.restore()
 }
 
+// A lattice-aligned 2D dodecahedron look-alike, as in the reference image.
+// It is intentionally not a perspective projection of a regular dodecahedron:
+// that would preserve phi, but its vertices would not meet this lattice.
+function drawDodecahedron(centerX, centerY, unit) {
+  // These twelve outline corners are intersections of the base's straight lines.
+  const step = Math.sqrt(3) / 5
+  const outline = [
+    [-step, -1], [step, -1], [2 * step, -0.8], [3 * step, -0.2],
+    [3 * step, 0.2], [2 * step, 0.8], [step, 1], [-step, 1],
+    [-2 * step, 0.8], [-3 * step, 0.2], [-3 * step, -0.2], [-2 * step, -0.8],
+  ]
+  const point = ([x, y]) => [centerX + x * unit, centerY + y * unit]
+  const line = (start, end) => {
+    ctx.beginPath()
+    ctx.moveTo(...point(start))
+    ctx.lineTo(...point(end))
+    ctx.stroke()
+  }
+
+  ctx.save()
+  ctx.strokeStyle = HIGHLIGHT_COLOR
+  ctx.lineCap = 'round'
+  ctx.lineJoin = 'round'
+  ctx.shadowColor = HIGHLIGHT_COLOR
+  ctx.shadowBlur = Math.max(5, unit * 0.055)
+  ctx.lineWidth = Math.max(1.5, unit * 0.012)
+  ctx.globalAlpha = 0.9
+
+  // Trace only the strong internal edges in the reference, not the faint
+  // Metatron construction lines visible through its blue fill.
+  const upperLeft = [-0.45, -0.76]
+  const upperMiddle = [0, -0.67]
+  const upperRight = [0.45, -0.76]
+  const lowerLeft = [-0.59, 0.33]
+  const lowerRight = [0.59, 0.33]
+  line(outline[11], upperLeft)
+  line(upperLeft, upperMiddle)
+  line(upperMiddle, upperRight)
+  line(upperRight, outline[2])
+  line([0, -1], [0, 1])
+  line(outline[10], lowerLeft)
+  line(lowerLeft, outline[7])
+  line(outline[3], lowerRight)
+  line(lowerRight, outline[6])
+  line([0, 0], lowerLeft)
+  line([0, 0], lowerRight)
+
+  ctx.globalAlpha = 1
+  ctx.lineWidth = Math.max(2.2, unit * 0.018)
+  outline.forEach((vertex, index) => line(vertex, outline[(index + 1) % outline.length]))
+  ctx.restore()
+}
+
 function render() {
   const bounds = canvas.getBoundingClientRect()
   const dpr = Math.min(window.devicePixelRatio || 1, 2)
@@ -218,8 +233,11 @@ function render() {
     if (button.getAttribute('aria-pressed') !== 'true') return
     const name = button.dataset.solid
     const scope = document.querySelector(`input[name="${name}-scope"]:checked`).value
-    if (scope === 'inner' || scope === 'both') drawSolid(solids[name], centerX, centerY, size * 0.165)
-    if (scope === 'outer' || scope === 'both') drawSolid(solids[name], centerX, centerY, size * 0.33)
+    const draw = name === 'dodecahedron'
+      ? (radius) => drawDodecahedron(centerX, centerY, radius)
+      : (radius) => drawSolid(solids[name], centerX, centerY, radius)
+    if (scope === 'inner' || scope === 'both') draw(size * 0.165)
+    if (scope === 'outer' || scope === 'both') draw(size * 0.33)
   })
 }
 
